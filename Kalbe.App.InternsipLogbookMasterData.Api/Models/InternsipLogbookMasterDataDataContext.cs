@@ -23,6 +23,18 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Models
         {
             if (modelBuilder != null)
             {
+                modelBuilder.Entity<UserRole>()
+                    .HasIndex(x => new { x.RoleCode, x.RoleName })
+                    .IsUnique()
+                    .HasFilter("\"IsDeleted\" = False");
+                modelBuilder.Entity<School>()
+                    .HasIndex(x => new { x.SchoolCode, x.SchoolName })
+                    .IsUnique()
+                    .HasFilter("\"IsDeleted\" = False");
+                modelBuilder.Entity<Faculty>()
+                    .HasIndex(x => new { x.FacultyCode, x.FacultyName })
+                    .IsUnique()
+                    .HasFilter("\"IsDeleted\" = False");
                 modelBuilder.HasPostgresExtension("citext");
             }
         }
