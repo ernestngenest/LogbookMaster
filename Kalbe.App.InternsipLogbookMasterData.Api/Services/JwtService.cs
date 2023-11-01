@@ -17,16 +17,20 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Services
     public class JwtService : IJwtService
     {
         private readonly JwtConfiguration _jwtConfiguration;
+        private IConfiguration _configuration;
+        private readonly string _secret;
 
-        public JwtService(IOptions<JwtConfiguration> jwtConfiguration)
+        public JwtService(IOptions<JwtConfiguration> jwtConfiguration, IConfiguration configuration)
         {
             _jwtConfiguration = jwtConfiguration.Value;
+            _configuration = configuration;
+            _secret = _configuration.GetSection("AppJwtSecret").Value;
         }
 
         public string GenerateToken(UserExternal userProfile)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_jwtConfiguration.Secret);
+            var key = Encoding.ASCII.GetBytes(_secret);
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(userProfile.GetClaims()),
@@ -40,7 +44,7 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Services
         public string GenerateTokenInternal(UserInternal userProfile)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_jwtConfiguration.Secret);
+            var key = Encoding.ASCII.GetBytes(_secret);
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(userProfile.GetClaims()),

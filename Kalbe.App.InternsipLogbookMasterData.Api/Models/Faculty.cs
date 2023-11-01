@@ -4,12 +4,12 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Kalbe.App.InternsipLogbookMasterData.Api.Models
 {
-    [Table("m_UserRole")]
-    public class UserRole : Base
+    [Table("m_Faculty")]
+    public class Faculty : Base
     {
         [Required]
-        public string RoleCode { get; set; }
+        public string FacultyCode { get; set; }
         [Required]
-        public string RoleName { get; set; }
+        public string FacultyName { get; set; }
     }
 }

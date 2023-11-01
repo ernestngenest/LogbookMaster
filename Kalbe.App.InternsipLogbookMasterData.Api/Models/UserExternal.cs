@@ -22,6 +22,8 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Models
         [MaxLength(100)]
         public string Password { get; set; }
 
+        public string Status { get; set; }
+
         //set relation
 
         public Claim[] GetClaims()

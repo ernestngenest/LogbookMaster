@@ -33,13 +33,8 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Auth
                 }
                 else
                 {
-                    var cacheValue = _cache.GetString(token);
-                    if (string.IsNullOrEmpty(cacheValue))
-                    {
-                        throw new InvalidOperationException("Cache is empty");
-                    }
 
-                    if (Utils.IsTokenValid(cacheValue, _configuration.GetSection("AppJwtSecret").Value, out JwtSecurityToken validToken) && context != null)
+                    if (Utils.IsTokenValid(token, _configuration.GetSection("AppJwtSecret").Value, out JwtSecurityToken validToken) && context != null)
                     {
                         context.User = new ClaimsPrincipal(new ClaimsIdentity(validToken.Claims));
                     }

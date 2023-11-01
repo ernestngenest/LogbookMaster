@@ -6,7 +6,6 @@ using System.Text.Json;
 
 namespace Kalbe.App.InternsipLogbookMasterData.Api.Models
 {
-    [Table("m_UserExternal")]
     public class UserInternal
     {
         public string UserPrincipalName { get; set; }
