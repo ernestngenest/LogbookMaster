@@ -9,6 +9,8 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Models
     public class UserExternal : Base
     {
         [Required]
+        public string UserPrincipalName { get; set; }
+        [Required]
         public string Name { get; set; }
         [Required]
         public long UniversityCode { get; set; }
@@ -23,6 +25,10 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Models
         public string Password { get; set; }
 
         public string Status { get; set; }
+        public string RoleCode { get; set; }
+        public string RoleName { get; set; }
+        public DateTime  JoinDate { get; set; }
+        public DateTime EndDate { get; set; }
 
         //set relation
 

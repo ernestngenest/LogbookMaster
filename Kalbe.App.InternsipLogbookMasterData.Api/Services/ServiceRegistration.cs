@@ -76,6 +76,10 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Services
             services.AddScoped<IUserExternalService, UserExternalService>();
             services.AddScoped<IJwtService, JwtService>();
             services.AddScoped<ILoggerHelper, LoggerHelper>();
+            services.AddScoped<ISchoolService, SchoolService>();
+            services.AddScoped<IFacultyService, FacultyService>();
+            services.AddScoped<IAllowanceService, AllowanceService>();
+            services.AddScoped<IUserRoleService, UserRoleService>();
 
 
             services.AddHttpClient<IAuthClientService, AuthClientService>();

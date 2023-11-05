@@ -96,5 +96,9 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Models
         //public virtual DbSet<Models.InternsipLogbookMasterData> InternsipLogbookMasterDatas { get; set; }
         public virtual DbSet<UserExternal> UserExternals { get; set; }
         public virtual DbSet<Logger> Loggers { get; set; }
+        public virtual DbSet<UserRole> Roles { get; set; }
+        public virtual DbSet<School> Schools { get; set;}
+        public virtual DbSet<Faculty> Faculties { get; set; }
+        public virtual DbSet<Allowance> Allowances { get; set; }
     }
 }

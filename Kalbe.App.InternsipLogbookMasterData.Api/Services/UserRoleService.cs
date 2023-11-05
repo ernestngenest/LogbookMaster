@@ -10,7 +10,7 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Services
     }
     public class UserRoleService : SimpleBaseCrud<UserRole>, IUserRoleService
     {
-        public UserRoleService(Library.Common.Logs.ILogger logger, DbContext dbContext) : base(logger, dbContext)
+        public UserRoleService(Library.Common.Logs.ILogger logger, InternsipLogbookMasterDataDataContext dbContext) : base(logger, dbContext)
         {
         }
     }
