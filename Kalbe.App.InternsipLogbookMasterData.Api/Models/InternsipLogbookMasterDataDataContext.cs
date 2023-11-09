@@ -100,5 +100,7 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Models
         public virtual DbSet<School> Schools { get; set;}
         public virtual DbSet<Faculty> Faculties { get; set; }
         public virtual DbSet<Allowance> Allowances { get; set; }
+        public virtual DbSet<Approval> Approvals { get; set; }
+        public virtual DbSet<ApprovalDetail> ApprovalsDetails { get; set;}
     }
 }
