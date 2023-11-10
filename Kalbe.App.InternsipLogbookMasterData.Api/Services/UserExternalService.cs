@@ -10,6 +10,7 @@ using Newtonsoft.Json;
 using Serilog.Events;
 using System.Diagnostics;
 using System.Text;
+using static MassTransit.ValidationResultExtensions;
 using ILogger = Kalbe.Library.Common.Logs.ILogger;
 using Logger = Kalbe.App.InternsipLogbookMasterData.Api.Models.Commons.Logger;
 
@@ -61,6 +62,7 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Services
                 timer.Start();
                 logData.ExternalEntity += "Start Save ";
                 logData.PayLoadType += "Entity Framework";
+                data.Status = "Unconfirmed";
                 _dbContext.Set<UserExternal>().Add(data);
                 await _dbContext.SaveChangesAsync();
                 timer.Stop();
@@ -99,6 +101,7 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Services
                 timer.Start();
                 logData.ExternalEntity += "Start Update ";
                 logData.PayLoadType += "Entity Framework";
+                data.Status = "Confirmed";
                 _dbContext.Update(data);
                 await _dbContext.SaveChangesAsync();
                 timer.Stop();
@@ -203,5 +206,46 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Services
         //        return builder.ToString().ToLower();
         //    return builder.ToString();
         //}
+
+        public async Task<IEnumerable<UserExternal>> GetByUnconfirmedUser()
+        {
+            #region log data
+            Logger logData = new Logger();
+            logData.CreatedDate = DateTime.Now;
+            logData.ModuleCode = _moduleCode;
+            logData.LogType = "Information";
+            logData.Activity = "Get Unconfirmed User";
+            var timer = new Stopwatch();
+            var timerFunction = new Stopwatch();
+            #endregion
+
+            try
+            {
+                timerFunction.Start();
+                timer.Start();
+                logData.ExternalEntity += "1. Start Get Unconfirmed Data";
+                logData.LogType += "Entity Framework";
+
+                var data = _dbContext.UserExternals.AsNoTracking().Where(x => x.Status.Equals("Unconfirmed")).ToList();
+
+                timer.Stop();
+                logData.ExternalEntity += "End get unconfirmed data duration : " + timer.Elapsed.ToString(@"m\:ss\.fff") + ". ";
+                timer.Reset();
+
+                timerFunction.Stop();
+                logData.Message += "Duration Call Save : " + timerFunction.Elapsed.ToString(@"m\:ss\.fff") + ". ";
+                await _loggerHelper.Save(logData);
+
+                return data;
+            }
+            catch (Exception ex)
+            {
+                timerFunction.Stop();
+                logData.LogType = "Error";
+                logData.Message += "Error " + ex + ". Duration : " + timerFunction.Elapsed.ToString(@"m\:ss\.fff") + ". ";
+                await _loggerHelper.Save(logData);
+                throw;
+            }
+        }
     }
 }

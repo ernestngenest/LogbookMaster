@@ -2,6 +2,7 @@
 {
     public class AppSettingModel
     {
+        public string UserProfile { get; set; }
         public string Authentication { get; set; }
         public string Notification { get; set; }
         public string MediaType { get; set; }
