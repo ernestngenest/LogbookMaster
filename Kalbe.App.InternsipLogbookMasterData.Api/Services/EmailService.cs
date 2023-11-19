@@ -1,20 +1,22 @@
 ﻿using Kalbe.App.InternsipLogbookMasterData.Api.Models;
 using Kalbe.App.InternsipLogbookMasterData.Api.Models.Commons;
+using Kalbe.Library.Common.Events.Services;
 using Kalbe.Library.Message.Bus;
 using MailKit.Net.Smtp;
 using MimeKit;
 
 namespace Kalbe.App.InternsipLogbookMasterData.Api.Services
 {
-    public interface IEmailServicie
+    public interface IEmailService
     {
         bool EmailNotification(Email _data);
+        Task SendEmailAsync(Email email);
     }
-    public class EmailService
+    public class EmailService : BaseEventService, IEmailService
     {
         private readonly IEventBus _eventBus;
 
-        public EmailService(IEventBus eventBus)
+        public EmailService(IEventBus eventBus) : base(eventBus)
         {
             _eventBus = eventBus;
         }
@@ -64,5 +66,29 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Services
         //    smtp.Send(email);
         //    smtp.Disconnect();
         //}
+
+        public async Task SendEmailAsync(Email email)
+        {
+            var mailSender = "internshiplogbook@outlook.com";
+            var pw = "Skrips1int3rn";
+
+            var message = new MimeMessage();
+            message.From.Add(MailboxAddress.Parse(mailSender));
+            message.To.Add(MailboxAddress.Parse(email.EmailTo));
+            message.Cc.Add(MailboxAddress.Parse(email.EmailCC));
+            message.Subject = email.EmailSubject;
+            message.Body = new TextPart(MimeKit.Text.TextFormat.Html)
+            {
+                Text = email.EmailBody,
+            };
+
+            using var smtp = new SmtpClient();
+            smtp.Connect("smtp-mail.outlook.com", 587, MailKit.Security.SecureSocketOptions.StartTls);
+
+            smtp.Authenticate(mailSender, pw);
+
+            smtp.Send(message);
+            smtp.Disconnect(true);
+        }
     }
 }

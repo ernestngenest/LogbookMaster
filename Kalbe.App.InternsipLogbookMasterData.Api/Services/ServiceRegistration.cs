@@ -1,8 +1,11 @@
 ﻿using Kalbe.App.InternsipLogbookMasterData.Api.Models;
 using Kalbe.App.InternsipLogbookMasterData.Api.Models.Commons;
+using Kalbe.App.InternsipLogbookMasterData.Api.Services.ClientService;
 using Kalbe.App.InternsipLogbookMasterData.Api.Utilities;
 using Kalbe.Library.Common.Logs;
 using Kalbe.Library.Data.EntityFrameworkCore.Data;
+using Kalbe.Library.Message.Bus;
+using Kalbe.Library.Message.Events;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
@@ -69,6 +72,12 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Services
                 });
             });
 
+            services.AddSingleton<IEventBus, RabbitMQBus>(sp =>
+            {
+                var scopeFactory = sp.GetRequiredService<IServiceScopeFactory>();
+                return new RabbitMQBus(configuration, scopeFactory);
+            });
+
             services.Configure<AppSettingModel>(opt => configuration.GetSection("ApiUrl").Bind(opt));
             services.Configure<JwtConfiguration>(opt => configuration.GetSection("JwtConfiguration").Bind(opt));
 
@@ -79,10 +88,17 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Services
             services.AddScoped<ISchoolService, SchoolService>();
             services.AddScoped<IFacultyService, FacultyService>();
             services.AddScoped<IAllowanceService, AllowanceService>();
+            services.AddScoped<IRoleService, RoleService>();
+            services.AddScoped<IApprovalService, ApprovalService>();
+            services.AddScoped<IApprovalDetaiilService, ApprovalDetailService>();
+            services.AddScoped<IEmailService, EmailService>();
+            services.AddScoped<IDepartmentService, DepartmentService>();
+            services.AddScoped<IUserInternalService, UserInternalService>();
             services.AddScoped<IUserRoleService, UserRoleService>();
 
 
             services.AddHttpClient<IAuthClientService, AuthClientService>();
+            services.AddHttpClient<IUserProfileClientService, UserProfileClientService>();
 
             return services;
         }

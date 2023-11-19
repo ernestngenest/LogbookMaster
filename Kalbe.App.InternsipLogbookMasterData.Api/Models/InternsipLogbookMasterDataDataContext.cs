@@ -23,7 +23,7 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Models
         {
             if (modelBuilder != null)
             {
-                modelBuilder.Entity<UserRole>()
+                modelBuilder.Entity<Role>()
                     .HasIndex(x => new { x.RoleCode, x.RoleName })
                     .IsUnique()
                     .HasFilter("\"IsDeleted\" = False");
@@ -96,11 +96,14 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Models
         //public virtual DbSet<Models.InternsipLogbookMasterData> InternsipLogbookMasterDatas { get; set; }
         public virtual DbSet<UserExternal> UserExternals { get; set; }
         public virtual DbSet<Logger> Loggers { get; set; }
-        public virtual DbSet<UserRole> Roles { get; set; }
+        public virtual DbSet<Role> Roles { get; set; }
         public virtual DbSet<School> Schools { get; set;}
         public virtual DbSet<Faculty> Faculties { get; set; }
         public virtual DbSet<Allowance> Allowances { get; set; }
         public virtual DbSet<Approval> Approvals { get; set; }
         public virtual DbSet<ApprovalDetail> ApprovalsDetails { get; set;}
+        public virtual DbSet<UserInternal> UserInternals { get; set; }
+        public virtual DbSet<Department> Departments { get; set; }
+        public virtual DbSet<UserRole> UserRoles { get; set; }
     }
 }

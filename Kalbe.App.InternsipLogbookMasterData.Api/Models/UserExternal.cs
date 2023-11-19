@@ -1,4 +1,5 @@
 ﻿using Kalbe.Library.Common.EntityFramework.Models;
+using MassTransit.Saga;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Security.Claims;
@@ -13,11 +14,13 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Models
         [Required]
         public string Name { get; set; }
         [Required]
-        public long UniversityCode { get; set; }
+        public string SchoolCode { get; set; }
         [Required]
-        public string UniversityName { get; set; }
+        public string SchoolName { get; set; }
+        public string FacultyCode { get; set; }
         [Required]
-        public string Major { get; set; }
+        public string Faculty { get; set; }
+        public string DeptCode { get; set; }
         [Required]
         public string Dept { get; set; }
 
@@ -25,13 +28,19 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Models
         public string Password { get; set; }
 
         public string Status { get; set; }
-        public string RoleCode { get; set; }
-        public string RoleName { get; set; }
+        //public string RoleCode { get; set; }
+        //public string RoleName { get; set; }
         public DateTime  JoinDate { get; set; }
         public DateTime EndDate { get; set; }
 
-        //set relation
+        public string SupervisorUpn { get; set; }
+        public string SupervisorName { get; set; }
+        public  string CompanyCode { get; set; }
+        public string CompanyName { get; set; }
+        public int InternshipPeriodMonth { get; set; }
 
+        //set relation
+        public UserRole UserRole { get; set; }
         public Claim[] GetClaims()
         {
             var claims = new List<Claim>();

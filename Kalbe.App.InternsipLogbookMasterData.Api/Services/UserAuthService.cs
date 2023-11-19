@@ -1,5 +1,6 @@
 ﻿using Kalbe.App.InternsipLogbookMasterData.Api.Models;
 using Kalbe.App.InternsipLogbookMasterData.Api.Models.Commons;
+using Kalbe.App.InternsipLogbookMasterData.Api.Services.ClientService;
 using Kalbe.App.InternsipLogbookMasterData.Api.Utilities;
 using MassTransit.JobService;
 using Microsoft.EntityFrameworkCore;

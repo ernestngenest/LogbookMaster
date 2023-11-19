@@ -6,7 +6,8 @@ using System.Text.Json;
 
 namespace Kalbe.App.InternsipLogbookMasterData.Api.Models
 {
-    public class UserInternal
+    [Table("m_UserInternal")]
+    public class UserInternal : Base
     {
         public string UserPrincipalName { get; set; }
         public string NIK { get; set; }
@@ -16,7 +17,8 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Models
         public string DeptName { get; set; }
         public string CompCode { get; set; }
         public string CompName { get; set; }
-        public List<UserRole> Roles { get; set; } = new List<UserRole>();
+        public string Password { get; set; }
+        public List<UserRole> UserRoles { get; set; } = new List<UserRole>();
         public Claim[] GetClaims()
         {
             var claims = new List<Claim>();
@@ -29,7 +31,7 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Models
                     claims.Add(new Claim(prop.Name, GetPropertyValue(prop)));
                 }
 
-                else if (prop.PropertyType.Equals(typeof(List<UserRole>)))
+                else if (prop.PropertyType.Equals(typeof(List<Role>)))
                 {
                     claims.Add(new Claim(prop.Name, JsonSerializer.Serialize(prop.GetValue(this))));
                 }

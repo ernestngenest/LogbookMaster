@@ -4,8 +4,10 @@ using Kalbe.App.InternsipLogbookMasterData.Api.Utilities;
 using Kalbe.Library.Common.EntityFramework.Data;
 using Kalbe.Library.Common.Logs;
 using MassTransit;
+using MassTransit.Configuration;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Serilog.Events;
 using System.Diagnostics;
@@ -22,6 +24,10 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Services
         Task<UserExternal> Update(UserExternal data);
         Task Delete(UserExternal data);
         string Encrypt(string password);
+
+        Task<IEnumerable<UserExternal>> GetUnconfirmedUser();
+        Task<UserExternal> ConfirmUser(long id);
+        Task<PagedList<UserExternal>> GetUserExternal(PagedOptions pagedOptions);
     }
     public class UserExternalService : SimpleBaseCrud<UserExternal>, IUserExternalService
     {
@@ -32,11 +38,18 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Services
         private readonly InternsipLogbookMasterDataDataContext _dbContext;
         private readonly ILoggerHelper _loggerHelper;
         private readonly ILogger _logger;
-        public UserExternalService(ILogger logger, InternsipLogbookMasterDataDataContext dbContext, ILoggerHelper loggerHelper) : base(logger, dbContext)
+        private readonly AppSettingModel _settingModel;
+        private readonly IOptions<AppSettingModel> _appSettings;
+        private readonly IEmailService _emailService;
+
+        public UserExternalService(ILogger logger, InternsipLogbookMasterDataDataContext dbContext, ILoggerHelper loggerHelper, IOptions<AppSettingModel> appSettings, IEmailService emailService) : base(logger, dbContext)
         {
             _logger = logger;
             _dbContext = dbContext;
             _loggerHelper = loggerHelper;
+            _appSettings = appSettings;
+            _settingModel = _appSettings.Value;
+            _emailService = emailService;
         }
 
         public override async Task<UserExternal> Save(UserExternal data)
@@ -63,6 +76,9 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Services
                 logData.ExternalEntity += "Start Save ";
                 logData.PayLoadType += "Entity Framework";
                 data.Status = "Unconfirmed";
+                data.UserRole.UserPrincipalName = data.UserPrincipalName;
+                data.UserRole.Name = data.Name;
+                data.EndDate = data.JoinDate.AddDays(30 * data.InternshipPeriodMonth);
                 _dbContext.Set<UserExternal>().Add(data);
                 await _dbContext.SaveChangesAsync();
                 timer.Stop();
@@ -122,6 +138,7 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Services
             }
 
         }
+
         public override async Task Delete(UserExternal data)
         {
             #region log data
@@ -207,7 +224,7 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Services
         //    return builder.ToString();
         //}
 
-        public async Task<IEnumerable<UserExternal>> GetByUnconfirmedUser()
+        public async Task<IEnumerable<UserExternal>> GetUnconfirmedUser()
         {
             #region log data
             Logger logData = new Logger();
@@ -237,6 +254,115 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Services
                 await _loggerHelper.Save(logData);
 
                 return data;
+            }
+            catch (Exception ex)
+            {
+                timerFunction.Stop();
+                logData.LogType = "Error";
+                logData.Message += "Error " + ex + ". Duration : " + timerFunction.Elapsed.ToString(@"m\:ss\.fff") + ". ";
+                await _loggerHelper.Save(logData);
+                throw;
+            }
+        }
+
+        public async Task<UserExternal> ConfirmUser(long id)
+        {
+            #region log data
+            Logger logData = new Logger();
+            logData.CreatedDate = DateTime.Now;
+            logData.ModuleCode = _moduleCode;
+            logData.LogType = "Information";
+            logData.Activity = "Confirm User";
+            var timer = new Stopwatch();
+            var timerFunction = new Stopwatch();
+            #endregion
+            using var transaction = await _dbContext.Database.BeginTransactionAsync();
+            try
+            {
+                timerFunction.Start();
+                timer.Start();
+
+                logData.ExternalEntity += "Start get update confirm status ";
+                logData.PayLoadType += "EF";
+
+                var dataUser = await GetById(id);
+
+                dataUser.Status = "Confirmed";
+
+                _dbContext.Entry(dataUser).State = EntityState.Modified;
+
+                _dbContext.SaveChanges();
+                await transaction.CommitAsync();
+
+                timer.Stop();
+                logData.ExternalEntity += "End update confirm status duration : " + timer.Elapsed.ToString(@"m\:ss\.fff") + ". ";
+                timer.Reset();
+
+                timerFunction.Stop();
+                logData.Message += "Duration Call Update Confirm : " + timerFunction.Elapsed.ToString(@"m\:ss\.fff") + ". ";
+                await _loggerHelper.Save(logData);
+
+                return dataUser;
+
+            }
+            catch (Exception ex)
+            {
+                timerFunction.Stop();
+                logData.LogType = "Error";
+                logData.Message += "Error " + ex + ". Duration : " + timerFunction.Elapsed.ToString(@"m\:ss\.fff") + ". ";
+                await _loggerHelper.Save(logData);
+                throw;
+            }
+        }
+
+        public async Task<PagedList<UserExternal>> GetUserExternal(PagedOptions pagedOptions)
+        {
+            #region log data
+            Logger logData = new Logger();
+            logData.CreatedDate = DateTime.Now;
+            logData.ModuleCode = _moduleCode;
+            logData.LogType = "Information";
+            logData.Activity = "Get User External PagedList";
+            var timer = new Stopwatch();
+            var timerFunction = new Stopwatch();
+            #endregion
+            try
+            {
+                if (pagedOptions == null)
+                {
+                    throw new Exception("Pagedoptions is empty, please check header");
+                }
+                timerFunction.Start();
+                timer.Start();
+
+                timer.Start();
+                logData.ExternalEntity += "1. Start Get User External Data";
+                logData.LogType += "EF";
+
+                var data = _dbContext.UserExternals.AsNoTracking()
+                            .Include(s => s.UserRole)
+                            .Where(x => !x.IsDeleted);
+
+                timer.Stop();
+                logData.ExternalEntity += "End get mentor duration : " + timer.Elapsed.ToString(@"m\:ss\.fff") + ". ";
+                timer.Reset();
+
+                timer.Start();
+                logData.ExternalEntity += "2. Start Get Pagedlist";
+                logData.LogType += "EF";
+
+
+
+                var result = await PagedList<UserExternal>.GetPagedList(data, pagedOptions);
+
+                timer.Stop();
+                logData.ExternalEntity += "End get mentor duration : " + timer.Elapsed.ToString(@"m\:ss\.fff") + ". ";
+                timer.Reset();
+
+                timerFunction.Stop();
+                logData.Message += "Duration Call : " + timerFunction.Elapsed.ToString(@"m\:ss\.fff") + ". ";
+                await _loggerHelper.Save(logData);
+                return result;
             }
             catch (Exception ex)
             {

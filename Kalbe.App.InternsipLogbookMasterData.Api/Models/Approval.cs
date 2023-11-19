@@ -19,7 +19,7 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Models
         public string Status { get; set; }
     }
 
-    [Table("t_Approval)")]
+    [Table("t_Approval")]
 
     public class ApprovalDetail : Base
     {
@@ -31,8 +31,24 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Models
         public int ApprovalLine { get; set; }
         public bool NeedApprove { get; set; }
         public string Notes { get; set; }
-        public string DueDate { get; set; }
+        public DateTime? ApproveDate { get; set; }
+        public DateTime? DueDate { get; set; }
 
+        public string CreatedByUpn { get; set; }
+
+        public string CreatedByEmail { get; set; }
+
+        public string CreatedByName { get; set; }
+
+        public DateTime CreatedDate { get; set; }
+
+        public string UpdatedByUpn { get; set; }
+
+        public string UpdatedByEmail { get; set; }
+
+        public string UpdatedByName { get; set; }
+
+        public DateTime? UpdatedDate { get; set; }
         [ForeignKey("ApprovalId")]
         [JsonIgnore]
         public Approval Approval { get; set; }
@@ -70,7 +86,7 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Models
         public string ModuleCode { get; set; }
         [Required]
         public int ApprovalLevel { get; set; }
-        public string ID { get; set; }
+        public long ID { get; set; }
         public long ApprovalID { get; set; }
         public string DocNo { get; set; }
         public string Role { get; set; }
@@ -81,9 +97,9 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Models
         public int ApprovalLine { get; set; }
         public string Notes { get; set; }
         public bool NeedApprove { get; set; }
-        public string ApproveDate { get; set; }
+        public DateTime? ApproveDate { get; set; }
         public string Status { get; set; }
-        public string DueDate { get; set; }
+        public DateTime? DueDate { get; set; }
         public string CreatedByUpn { get; set; } = "";
         public string CreatedByEmail { get; set; } = "";
         public string CreatedByName { get; set; } = "";

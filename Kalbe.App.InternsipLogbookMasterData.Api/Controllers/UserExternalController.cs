@@ -14,8 +14,59 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Controllers
     public class UserExternalController : SimpleBaseCrudController<UserExternal>
     {
         private readonly IHttpContextAccessor _contextAccessor;
+        private readonly IUserExternalService _service;
+        private readonly IDatabaseExceptionHandler _handler;
         public UserExternalController(IUserExternalService simpleBaseCrud, IDatabaseExceptionHandler databaseExceptionHandler) : base(simpleBaseCrud, databaseExceptionHandler)
         {
+            _service = simpleBaseCrud;
+            _handler = databaseExceptionHandler;
+        }
+
+        [HttpGet("GetUnconfimedIntern")]
+        public async Task<IActionResult> GetUnconfrimedIntern()
+        {
+            try
+            {
+                var result = await _service.GetUnconfirmedUser();
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPut("ConfirmUser/{id}")]
+        public async Task<IActionResult> ConfirmUser(long id)
+        {
+            try
+            {
+                var result = await _service.ConfirmUser(id);
+                return Ok(result);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpGet("GetUserExternal")]
+        public async Task<IActionResult> GetUserExternal()
+        {
+            try
+            {
+                PagedOptions pagedOptions = PagedOptions.GetPagedOptions(base.Request);
+                if (pagedOptions == null)
+                {
+                    return BadRequest("This request require pagination header parameter");
+                }
+
+                return Ok(await _service.GetUserExternal(pagedOptions));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
     }

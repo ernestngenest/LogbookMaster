@@ -1,4 +1,5 @@
-﻿using Kalbe.App.InternsipLogbookMasterData.Api.Models;
+﻿
+using Kalbe.App.InternsipLogbookMasterData.Api.Models;
 using Kalbe.App.InternsipLogbookMasterData.Api.Services;
 using Kalbe.Library.Common.EntityFramework.Controllers;
 using Kalbe.Library.Common.EntityFramework.Data;
@@ -11,9 +12,9 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [AllowAnonymous]
-    public class AllowanceController : SimpleBaseCrudController<Allowance>
+    public class ApprovalController : SimpleBaseCrudController<Approval>
     {
-        public AllowanceController(IAllowanceService simpleBaseCrud, IDatabaseExceptionHandler databaseExceptionHandler) : base(simpleBaseCrud, databaseExceptionHandler)
+        public ApprovalController(IApprovalService simpleBaseCrud, IDatabaseExceptionHandler databaseExceptionHandler) : base(simpleBaseCrud, databaseExceptionHandler)
         {
         }
     }

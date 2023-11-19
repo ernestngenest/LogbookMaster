@@ -13,7 +13,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using static Kalbe.App.InternsipLogbookMasterData.Api.Models.UserInternal;
 
-namespace Kalbe.App.InternsipLogbookMasterData.Api.Services
+namespace Kalbe.App.InternsipLogbookMasterData.Api.Services.ClientService
 {
     public interface IAuthClientService
     {
@@ -87,7 +87,7 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Services
                         dataUserInternal.CompName = Utils.GetClaim(securityToken, Constant.CompName);
                         sRoles = Utils.GetClaim(securityToken, Constant.Roles);
                     }
-                    dataUserInternal.Roles = JsonConvert.DeserializeObject<List<UserRole>>(sRoles);
+                    dataUserInternal.UserRoles = JsonConvert.DeserializeObject<List<UserRole>>(sRoles);
                 }
                 else
                 {
