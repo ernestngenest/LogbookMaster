@@ -8,6 +8,7 @@ using Kalbe.App.InternsipLogbookMasterData.API.Objects;
 using Kalbe.Library.Common.EntityFramework.Data;
 using Kalbe.Library.Common.Logs;
 using Kalbe.Library.Common.Models;
+using Kalbe.Library.Data.EntityFrameworkCore.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Logging;
 using Newtonsoft.Json;
@@ -23,11 +24,15 @@ using Logger = Kalbe.App.InternsipLogbookMasterData.Api.Models.Commons.Logger;
 
 namespace Kalbe.App.InternsipLogbookMasterData.Api.Services
 {
-    public interface IApprovalDetaiilService : ISimpleBaseCrud<ApprovalDetail>
+    public interface IApprovalDetaiilService : IChildService<ApprovalDetail>
     {
-
+        Task<ServiceResponse<List<ApprovalTransactionDataModel>>> GetCurrentApprovalAsync(string AppCode, string ModuleCode, string DocNo, bool GetMultiple);
+        Task<ServiceResponse<int>> SubmitDataAsync(ApprovalTransactionData data);
+        Task<ServiceResponse<int>> ApproveDataAsync(ApprovalTransactionData _obj);
+        Task<ServiceResponse<int>> DeleteWFAsync(ApprovalTransactionData _obj, bool notInsertApprovalLog);
+        Task<ServiceResponse<int>> Reject(ApprovalLogModel _obj);
     }
-    public class ApprovalDetailService : SimpleBaseCrud<ApprovalDetail>, IApprovalDetaiilService
+    public class ApprovalDetailService : ChildService<ApprovalDetail>, IApprovalDetaiilService
     {
         private readonly InternsipLogbookMasterDataDataContext _dbContext;
         private readonly ILogger _logger;
@@ -176,7 +181,7 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Services
 
                         _dbContext.ApprovalsDetails.AddRange((IEnumerable<ApprovalDetail>)approvalTransactionList);
 
-                        await SendEmail(data.EmailData, data.ApproverTo, "Submit");
+                        //await SendEmail(data.EmailData, data.ApproverTo, "Submit");
                         await transaction.CommitAsync();
                         response.Message = messageSuccess;
                     }
@@ -214,41 +219,41 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Services
             return message;
         }
 
-        private async Task<string> SendEmail(Models.Email _obj, string approverTo, string methodName)
-        {
-            var serviceResponse = new ServiceResponse<object>();
-            try
-            {
-                // Notification Approval. will pass if model is exist
-                // please fill emailTo from web for testing. it will skip this line
-                if (string.IsNullOrEmpty(_obj.EmailTo))
-                {
-                    var userProfile = await _userProfileClientService.GetUserByUPNAsync(approverTo);
-                    _obj.EmailTo = userProfile.Email;
-                }
-                bool responseEmail = _emailService.EmailNotification(_obj);
-                var logger = new Models.Commons.Logger();
-                if (responseEmail)
-                {
-                    //_loggerHelper.Save(_obj.SystemCode, _obj.ModuleCode, _obj.DocumentNumber, _obj.EmailTo, _obj.EmailCC, _obj.EmailBCC, _obj.EmailSubject, _obj.EmailBody, "Send Email " + methodName + " Success");
-                    serviceResponse.Success = true;
-                }
-                else
-                {
-                    //_logHelper.LogNotification(_obj.SystemCode, _obj.ModuleCode, _obj.DocumentNumber, _obj.EmailTo, _obj.EmailCC, _obj.EmailBCC, _obj.EmailSubject, _obj.EmailBody, "Send Email " + methodName + " Failed");
-                    serviceResponse.Success = false;
-                }
-            }
-            catch (Exception ex)
-            {
-                //Insert Log Error
-                //_logHelper.LogError(_obj.SystemCode, _obj.ModuleCode, _obj.DocumentNumber, ex.ToString(), "PostDataWithDueDateAsync");
-                //_logHelper.LogNotification(_obj.SystemCode, _obj.ModuleCode, _obj.DocumentNumber, _obj.EmailTo, _obj.EmailCC, _obj.EmailBCC, _obj.EmailSubject, _obj.EmailBody, "Send Email " + methodName + " Failed");
-                serviceResponse.Success = false;
-            }
+        //private async Task<string> SendEmail(Models.Email _obj, string approverTo, string methodName)
+        //{
+        //    var serviceResponse = new ServiceResponse<object>();
+        //    try
+        //    {
+        //        // Notification Approval. will pass if model is exist
+        //        // please fill emailTo from web for testing. it will skip this line
+        //        if (string.IsNullOrEmpty(_obj.EmailTo))
+        //        {
+        //            var userProfile = await _userProfileClientService.GetUserByUPNAsync(approverTo);
+        //            _obj.EmailTo = userProfile.Email;
+        //        }
+        //        bool responseEmail = _emailService.EmailNotification(_obj);
+        //        var logger = new Models.Commons.Logger();
+        //        if (responseEmail)
+        //        {
+        //            //_loggerHelper.Save(_obj.SystemCode, _obj.ModuleCode, _obj.DocumentNumber, _obj.EmailTo, _obj.EmailCC, _obj.EmailBCC, _obj.EmailSubject, _obj.EmailBody, "Send Email " + methodName + " Success");
+        //            serviceResponse.Success = true;
+        //        }
+        //        else
+        //        {
+        //            //_logHelper.LogNotification(_obj.SystemCode, _obj.ModuleCode, _obj.DocumentNumber, _obj.EmailTo, _obj.EmailCC, _obj.EmailBCC, _obj.EmailSubject, _obj.EmailBody, "Send Email " + methodName + " Failed");
+        //            serviceResponse.Success = false;
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        //Insert Log Error
+        //        //_logHelper.LogError(_obj.SystemCode, _obj.ModuleCode, _obj.DocumentNumber, ex.ToString(), "PostDataWithDueDateAsync");
+        //        //_logHelper.LogNotification(_obj.SystemCode, _obj.ModuleCode, _obj.DocumentNumber, _obj.EmailTo, _obj.EmailCC, _obj.EmailBCC, _obj.EmailSubject, _obj.EmailBody, "Send Email " + methodName + " Failed");
+        //        serviceResponse.Success = false;
+        //    }
 
-            return serviceResponse.Success.ToString();
-        }
+        //    return serviceResponse.Success.ToString();
+        //}
 
         public async Task<ServiceResponse<int>> ApproveDataAsync(ApprovalTransactionData _obj)
         {
@@ -338,7 +343,7 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Services
                                             }),
                     };
                     await _loggerHelper.Save(approvalEvent);
-                    await SendEmail(_obj.EmailData, approverTo, "Approve");
+                    //await SendEmail(_obj.EmailData, approverTo, "Approve");
 
                     serviceResponse.Message = "Success Approve";
                 }
@@ -484,7 +489,7 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Services
                     //    }
                     //    _logHelper.EmailNotifictaion(_obj.EmailData);
                     //}
-                    await SendEmail(_obj.EmailData, _obj.ApproverTo, "Reject");
+                    //await SendEmail(_obj.EmailData, _obj.ApproverTo, "Reject");
                     serviceResponse.Message = messageSuccess;// "Success insert workflow approval";
                 }
                 catch (Exception ex)

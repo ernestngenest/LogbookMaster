@@ -84,5 +84,11 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Models
         public string Password { get; set; }
 
     }
+
+    public class Mentor
+    {
+        public string MentorUPN { get; set; }
+        public string MentorName { get; set; }
+    }
         
 }

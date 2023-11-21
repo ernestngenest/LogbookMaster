@@ -3,12 +3,15 @@ using Kalbe.App.InternsipLogbookMasterData.Api.Services;
 using Kalbe.Library.Common.EntityFramework.Controllers;
 using Kalbe.Library.Common.EntityFramework.Data;
 using Kalbe.Library.Data.EntityFrameworkCore.Data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Kalbe.App.InternsipLogbookMasterData.Api.Controllers
 {
     [ApiController]
     [Route("/api/[controller]")]
+    [AllowAnonymous]
     public class UserInternalController : SimpleBaseCrudController<UserInternal>
     {
         private readonly IUserInternalService _userInternalService;

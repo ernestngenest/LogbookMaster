@@ -32,7 +32,7 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Models
         public bool NeedApprove { get; set; }
         public string Notes { get; set; }
         public DateTime? ApproveDate { get; set; }
-        public DateTime? DueDate { get; set; }
+        public DateTime DueDate { get; set; }
 
         public string CreatedByUpn { get; set; }
 

@@ -5,6 +5,7 @@ using Kalbe.App.InternsipLogbookMasterData.Api.Utilities;
 using MassTransit.JobService;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using System.Data;
 using System.Diagnostics;
 using static Kalbe.App.InternsipLogbookMasterData.Api.Models.UserInternal;
 
@@ -52,8 +53,11 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Services
 
                 timer.Start();
                 logData.ExternalEntity += "Start LoginAsync ";
-                logData.PayLoadType += "API Authenticate";
-                var respUser = await _authClientService.LoginAsync(data);
+                logData.PayLoadType += "EF, ";
+                var respUser = await _dbContext.UserInternals
+                    .AsNoTracking()
+                    .Where(x => !x.IsDeleted)
+                    .FirstOrDefaultAsync(x => x.UserPrincipalName == data.Username);
                 timer.Stop();
                 logData.ExternalEntity += "End LoginAsync duration : " + timer.Elapsed.ToString(@"m\:ss\.fff") + ". ";
 

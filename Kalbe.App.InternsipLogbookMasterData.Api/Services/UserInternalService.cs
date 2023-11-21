@@ -1,4 +1,5 @@
-﻿using Kalbe.App.InternsipLogbookMasterData.Api.Models;
+﻿using Elasticsearch.Net;
+using Kalbe.App.InternsipLogbookMasterData.Api.Models;
 using Kalbe.App.InternsipLogbookMasterData.Api.Models.Commons;
 using Kalbe.App.InternsipLogbookMasterData.Api.Utilities;
 using Kalbe.Library.Common.EntityFramework.Data;

@@ -4,6 +4,7 @@ using Kalbe.App.InternsipLogbookMasterData.Api.Services;
 using Kalbe.Library.Common.EntityFramework.Controllers;
 using Kalbe.Library.Common.EntityFramework.Data;
 using Kalbe.Library.Data.EntityFrameworkCore.Data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
@@ -11,6 +12,7 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [AllowAnonymous]
     public class UserExternalController : SimpleBaseCrudController<UserExternal>
     {
         private readonly IHttpContextAccessor _contextAccessor;
@@ -69,5 +71,18 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Controllers
             }
         }
 
+        [HttpGet("GetMentorByUPN/{UPN}")]
+        public async Task<IActionResult> GetMentorByUPN(string UPN)
+        {
+            try
+            {
+                var result = await _service.GetMentorByUPN(UPN);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return NotFound("data not found");
+            }
+        }
     }
 }

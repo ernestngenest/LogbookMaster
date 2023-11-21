@@ -28,6 +28,7 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Services
         Task<IEnumerable<UserExternal>> GetUnconfirmedUser();
         Task<UserExternal> ConfirmUser(long id);
         Task<PagedList<UserExternal>> GetUserExternal(PagedOptions pagedOptions);
+        Task<Mentor> GetMentorByUPN(string UPN);
     }
     public class UserExternalService : SimpleBaseCrud<UserExternal>, IUserExternalService
     {
@@ -241,7 +242,7 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Services
                 timerFunction.Start();
                 timer.Start();
                 logData.ExternalEntity += "1. Start Get Unconfirmed Data";
-                logData.LogType += "Entity Framework";
+                logData.PayLoadType += "Entity Framework";
 
                 var data = _dbContext.UserExternals.AsNoTracking().Where(x => x.Status.Equals("Unconfirmed")).ToList();
 
@@ -344,12 +345,12 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Services
                             .Where(x => !x.IsDeleted);
 
                 timer.Stop();
-                logData.ExternalEntity += "End get mentor duration : " + timer.Elapsed.ToString(@"m\:ss\.fff") + ". ";
+                logData.ExternalEntity += "End get user external duration : " + timer.Elapsed.ToString(@"m\:ss\.fff") + ". ";
                 timer.Reset();
 
                 timer.Start();
                 logData.ExternalEntity += "2. Start Get Pagedlist";
-                logData.LogType += "EF";
+                logData.PayLoadType += "EF";
 
 
 
@@ -363,6 +364,54 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Services
                 logData.Message += "Duration Call : " + timerFunction.Elapsed.ToString(@"m\:ss\.fff") + ". ";
                 await _loggerHelper.Save(logData);
                 return result;
+            }
+            catch (Exception ex)
+            {
+                timerFunction.Stop();
+                logData.LogType = "Error";
+                logData.Message += "Error " + ex + ". Duration : " + timerFunction.Elapsed.ToString(@"m\:ss\.fff") + ". ";
+                await _loggerHelper.Save(logData);
+                throw;
+            }
+        }
+
+        public async Task<Mentor> GetMentorByUPN(string UPN)
+        {
+            #region log data
+            Logger logData = new Logger();
+            logData.CreatedDate = DateTime.Now;
+            logData.ModuleCode = _moduleCode;
+            logData.LogType = "Information";
+            logData.Activity = "Get Mentor By UPN";
+            var timer = new Stopwatch();
+            var timerFunction = new Stopwatch();
+            #endregion
+            try
+            {
+                timerFunction.Start();
+                timer.Start();
+
+                timer.Start();
+                logData.ExternalEntity += "1. Start Get Mentor Data";
+                logData.PayLoadType += "EF";
+
+                var data = _dbContext.UserExternals.AsNoTracking()
+                            .Where(x => !x.IsDeleted && x.UserPrincipalName == UPN).FirstOrDefault();
+                var mentor = new Mentor
+                {
+                    MentorName = data.SupervisorName,
+                    MentorUPN = data.SupervisorUpn
+                };
+
+                timer.Stop();
+                logData.ExternalEntity += "End get Get Mentor Data duration : " + timer.Elapsed.ToString(@"m\:ss\.fff") + ". ";
+                timer.Reset();
+
+
+                timerFunction.Stop();
+                logData.Message += "Duration Call : " + timerFunction.Elapsed.ToString(@"m\:ss\.fff") + ". ";
+                await _loggerHelper.Save(logData);
+                return mentor;
             }
             catch (Exception ex)
             {
