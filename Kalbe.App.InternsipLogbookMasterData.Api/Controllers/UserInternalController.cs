@@ -20,6 +20,7 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Controllers
         {
             _userInternalService = simpleBaseCrud;
             _databaseExceptionHandler = databaseExceptionHandler;
+            
         }
 
         [HttpGet("GetUserInternal")]
@@ -34,6 +35,18 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Controllers
                 }
 
                 return Ok(await _userInternalService.GetUserInternal(pagedOptions));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpGet("GetByUPN/{UPN}")]
+        public async Task<IActionResult> GetByUPN(string upn)
+        {
+            try
+            {
+                return Ok(await _userInternalService.GetByUPN(upn));
             }
             catch (Exception ex)
             {

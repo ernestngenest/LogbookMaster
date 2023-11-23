@@ -16,6 +16,7 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Services
     public interface IUserInternalService : ISimpleBaseCrud<UserInternal>
     {
         Task<PagedList<UserInternal>> GetUserInternal(PagedOptions pagedOptions);
+        Task<UserInternal> GetByUPN(string upn);
     }
     public class UserInternalService : SimpleBaseCrud<UserInternal>, IUserInternalService
     {
@@ -144,6 +145,49 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Services
                 logData.Message += "Duration Call : " + timerFunction.Elapsed.ToString(@"m\:ss\.fff") + ". ";
                 await _loggerHelper.Save(logData);
                 return result;
+            }
+            catch (Exception ex)
+            {
+                timerFunction.Stop();
+                logData.LogType = "Error";
+                logData.Message += "Error " + ex + ". Duration : " + timerFunction.Elapsed.ToString(@"m\:ss\.fff") + ". ";
+                await _loggerHelper.Save(logData);
+                throw;
+            }
+        }
+
+        public async Task<UserInternal> GetByUPN(string upn)
+        {
+            #region log data
+            Logger logData = new Logger();
+            logData.CreatedDate = DateTime.Now;
+            logData.ModuleCode = _moduleCode;
+            logData.LogType = "Information";
+            logData.Activity = "Get By Upn";
+            var timer = new Stopwatch();
+            var timerFunction = new Stopwatch();
+            #endregion
+            try
+            {
+                timerFunction.Start();
+                timer.Start();
+
+                timer.Start();
+                logData.ExternalEntity += "1. Start Get User Internal Data";
+                logData.LogType += "EF";
+
+                var data = _dbContext.UserInternals.AsNoTracking()
+                            .Include(s => s.UserRoles.Where(x => !x.IsDeleted))
+                            .Where(x => !x.IsDeleted && x.UserPrincipalName.Equals(upn)).FirstOrDefault();
+
+                timer.Stop();
+                logData.ExternalEntity += "End get mentor duration : " + timer.Elapsed.ToString(@"m\:ss\.fff") + ". ";
+                timer.Reset();
+
+                timerFunction.Stop();
+                logData.Message += "Duration Call : " + timerFunction.Elapsed.ToString(@"m\:ss\.fff") + ". ";
+                await _loggerHelper.Save(logData);
+                return data;
             }
             catch (Exception ex)
             {

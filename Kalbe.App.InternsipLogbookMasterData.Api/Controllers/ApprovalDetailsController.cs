@@ -6,6 +6,7 @@ using Kalbe.Library.Common.EntityFramework.Controllers;
 using Kalbe.Library.Common.EntityFramework.Data;
 using Kalbe.Library.Data.EntityFrameworkCore.Data;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
 
 namespace Kalbe.App.InternsipLogbookMasterData.Api.Controllers
 {
@@ -31,6 +32,13 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Controllers
             }
         }
 
+        [HttpGet("CurrentWF/Multiple/{AppCode}/{ModuleCode}/{DocNo}")]
+        public async Task<IActionResult> GetListCurrentApproval(string AppCode, string ModuleCode, string DocNo)
+        {
+            string sDocNo = WebUtility.UrlDecode(DocNo);
+            var response = await _approvalDetaiilService.GetCurrentApprovalAsync(AppCode, ModuleCode, sDocNo, true);
+            return GetResult(response);
+        }
         [HttpPut("Approve")]
         public async Task<IActionResult> ApproveData(ApprovalTransactionData _approvalTransactionData)
         {
