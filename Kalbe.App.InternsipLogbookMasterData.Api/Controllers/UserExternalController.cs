@@ -24,7 +24,7 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Controllers
             _handler = databaseExceptionHandler;
         }
 
-        [HttpGet("GetUnconfimedIntern")]
+        [HttpGet("GetUnconfirmedIntern")]
         public async Task<IActionResult> GetUnconfrimedIntern()
         {
             try
@@ -52,6 +52,19 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Controllers
             }
         }
 
+        //[HttpPut("ReviseUser")]
+        //public async Task<IActionResult> ReviseUser([FromBody] UserExternal data)
+        //{
+        //    try
+        //    {
+        //        var result = await _service.Update(data);
+        //        return Ok(result);
+        //    }
+        //    catch (InvalidOperationException ex)
+        //    {
+        //        return BadRequest(ex.Message);
+        //    }
+        //}
         [HttpGet("GetUserExternal")]
         public async Task<IActionResult> GetUserExternal()
         {

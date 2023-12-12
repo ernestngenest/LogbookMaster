@@ -53,5 +53,32 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpGet("GetUserListByRoleCode/{roleCode}")]
+        public async Task<IActionResult> GetUserListByRoleCode(string roleCode)
+        {
+            try
+            {
+                var result = await _userInternalService.GetUserListByRoleCode(roleCode);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpDelete("{id}")]
+        public override async Task<IActionResult> Delete(long id)
+        {
+            var existingData = await _userInternalService.GetById(id);
+            if (existingData == null)
+            {
+                return NotFound();
+            }
+
+            await _userInternalService.Delete(existingData);
+            return Ok();
+        }
     }
 }

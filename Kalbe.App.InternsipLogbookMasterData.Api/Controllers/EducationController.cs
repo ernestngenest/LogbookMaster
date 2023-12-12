@@ -11,10 +11,15 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [AllowAnonymous]
-    public class AllowanceController : SimpleBaseCrudController<Allowance>
+    public class EducationController : SimpleBaseCrudController<Education>
     {
-        public AllowanceController(IAllowanceService simpleBaseCrud, IDatabaseExceptionHandler databaseExceptionHandler) : base(simpleBaseCrud, databaseExceptionHandler)
+        private readonly IEducationService educationService;
+        private readonly IDatabaseExceptionHandler dbHandler;
+
+        public EducationController(IEducationService simpleBaseCrud, IDatabaseExceptionHandler databaseExceptionHandler) : base(simpleBaseCrud, databaseExceptionHandler)
         {
+            educationService = simpleBaseCrud;
+            dbHandler = databaseExceptionHandler;
         }
     }
 }

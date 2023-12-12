@@ -23,6 +23,9 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Models
         public string DeptCode { get; set; }
         [Required]
         public string Dept { get; set; }
+        public string EducationCode { get; set; }
+        [Required]
+        public string Education { get; set;}
 
         [MaxLength(100)]
         public string Password { get; set; }
@@ -89,6 +92,7 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Models
     {
         public string MentorUPN { get; set; }
         public string MentorName { get; set; }
+        public string MentorEmail { get; set; }
     }
         
 }

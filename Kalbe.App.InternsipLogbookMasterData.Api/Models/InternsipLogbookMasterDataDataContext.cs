@@ -105,5 +105,6 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Models
         public virtual DbSet<UserInternal> UserInternals { get; set; }
         public virtual DbSet<Department> Departments { get; set; }
         public virtual DbSet<UserRole> UserRoles { get; set; }
+        public virtual DbSet<Education> Educations { get; set; }
     }
 }

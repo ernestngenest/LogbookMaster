@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Kalbe.App.InternsipLogbookMasterData.Api.Migrations
 {
     [DbContext(typeof(InternsipLogbookMasterDataDataContext))]
-    [Migration("20231121031132_Update_t_Approval")]
-    partial class Update_t_Approval
+    [Migration("20231212052041_add_m_Education")]
+    partial class add_m_Education
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -45,6 +45,9 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("timestamp without time zone");
 
+                    b.Property<long>("EducationId")
+                        .HasColumnType("bigint");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
@@ -62,6 +65,8 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Migrations
                         .HasColumnType("citext");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("EducationId");
 
                     b.ToTable("m_Allowance");
                 });
@@ -154,7 +159,7 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Migrations
                     b.Property<string>("DocumentNumber")
                         .HasColumnType("citext");
 
-                    b.Property<DateTime?>("DueDate")
+                    b.Property<DateTime>("DueDate")
                         .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("EmailPIC")
@@ -300,6 +305,46 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("m_Department");
+                });
+
+            modelBuilder.Entity("Kalbe.App.InternsipLogbookMasterData.Api.Models.Education", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("citext");
+
+                    b.Property<string>("CreatedByName")
+                        .HasColumnType("citext");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("EducationCode")
+                        .HasColumnType("citext");
+
+                    b.Property<string>("EducationName")
+                        .HasColumnType("citext");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("citext");
+
+                    b.Property<string>("UpdatedByName")
+                        .HasColumnType("citext");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("m_Education");
                 });
 
             modelBuilder.Entity("Kalbe.App.InternsipLogbookMasterData.Api.Models.Faculty", b =>
@@ -468,6 +513,13 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Migrations
                         .HasColumnType("citext");
 
                     b.Property<string>("DeptCode")
+                        .HasColumnType("citext");
+
+                    b.Property<string>("Education")
+                        .IsRequired()
+                        .HasColumnType("citext");
+
+                    b.Property<string>("EducationCode")
                         .HasColumnType("citext");
 
                     b.Property<DateTime>("EndDate")
@@ -655,6 +707,17 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Migrations
                     b.ToTable("t_UserRole");
                 });
 
+            modelBuilder.Entity("Kalbe.App.InternsipLogbookMasterData.Api.Models.Allowance", b =>
+                {
+                    b.HasOne("Kalbe.App.InternsipLogbookMasterData.Api.Models.Education", "Education")
+                        .WithMany("Allowances")
+                        .HasForeignKey("EducationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Education");
+                });
+
             modelBuilder.Entity("Kalbe.App.InternsipLogbookMasterData.Api.Models.ApprovalDetail", b =>
                 {
                     b.HasOne("Kalbe.App.InternsipLogbookMasterData.Api.Models.Approval", "Approval")
@@ -679,6 +742,11 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Migrations
                     b.Navigation("UserExternal");
 
                     b.Navigation("UserInternal");
+                });
+
+            modelBuilder.Entity("Kalbe.App.InternsipLogbookMasterData.Api.Models.Education", b =>
+                {
+                    b.Navigation("Allowances");
                 });
 
             modelBuilder.Entity("Kalbe.App.InternsipLogbookMasterData.Api.Models.UserExternal", b =>

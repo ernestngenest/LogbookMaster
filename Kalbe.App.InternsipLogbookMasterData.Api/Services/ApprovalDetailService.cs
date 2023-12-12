@@ -146,7 +146,7 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Services
 
             if (data != null)
             {
-                var approvalTransactionList = new List<ApprovalTransactionDataModel>();
+                var approvalTransactionList = new List<ApprovalDetail>();
                 using var transaction = await _dbContext.Database.BeginTransactionAsync();
                 try
                 {
@@ -157,19 +157,18 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Services
                         int i = 0;
                         foreach (var item in data.ApprovalTransactionDataModel)
                         {
-                            ApprovalTransactionDataModel approvalTransactionDataModels = new();
-                            approvalTransactionDataModels.SystemCode = Constant.SystemCode;
-                            approvalTransactionDataModels.ModuleCode = data.ModuleCode;
-                            approvalTransactionDataModels.ApprovalLevel = item.ApprovalLevel;
-                            approvalTransactionDataModels.DocNo = data.DocNo;
+                            ApprovalDetail approvalTransactionDataModels = new();
+                            approvalTransactionDataModels.DocumentNumber = data.DocNo;
                             approvalTransactionDataModels.EmailPIC = item.EmailPIC;
                             approvalTransactionDataModels.NamePIC = item.NamePIC;
                             approvalTransactionDataModels.PIC = item.PIC;
                             approvalTransactionDataModels.ApprovalLine = item.ApprovalLine;
                             approvalTransactionDataModels.NeedApprove = item.NeedApprove;
-                            approvalTransactionDataModels.CreatedByUpn = data.CreatedBy;
+                            approvalTransactionDataModels.CreatedByUpn = data.ApproverFromEmail;
                             approvalTransactionDataModels.CreatedByEmail = data.ApproverFromEmail;
                             approvalTransactionDataModels.CreatedByName = data.ApproverFromName;
+                            approvalTransactionDataModels.CreatedDate = DateTime.Now;
+                            approvalTransactionDataModels.ApprovalId = approvalId;
                             approvalTransactionList.Add(approvalTransactionDataModels);
 
                             if (item.ApprovalLevel == 1 && i == 0)
@@ -179,9 +178,10 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Services
                             i++;
                         }
 
-                        _dbContext.ApprovalsDetails.AddRange((IEnumerable<ApprovalDetail>)approvalTransactionList);
+                        _dbContext.ApprovalsDetails.AddRange(approvalTransactionList);
 
                         //await SendEmail(data.EmailData, data.ApproverTo, "Submit");
+                        _dbContext.SaveChanges();
                         await transaction.CommitAsync();
                         response.Message = messageSuccess;
                     }

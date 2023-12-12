@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Kalbe.App.InternsipLogbookMasterData.Api.Migrations
 {
     [DbContext(typeof(InternsipLogbookMasterDataDataContext))]
-    [Migration("20231115060542_userRoletoRole")]
-    partial class userRoletoRole
+    [Migration("20231212022452_addEducation_m_Allowance")]
+    partial class addEducation_m_Allowance
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -44,6 +44,10 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Migrations
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("Education")
+                        .IsRequired()
+                        .HasColumnType("citext");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
@@ -133,10 +137,19 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Migrations
                     b.Property<int>("ApprovalLine")
                         .HasColumnType("integer");
 
+                    b.Property<DateTime?>("ApproveDate")
+                        .HasColumnType("timestamp without time zone");
+
                     b.Property<string>("CreatedBy")
                         .HasColumnType("citext");
 
+                    b.Property<string>("CreatedByEmail")
+                        .HasColumnType("citext");
+
                     b.Property<string>("CreatedByName")
+                        .HasColumnType("citext");
+
+                    b.Property<string>("CreatedByUpn")
                         .HasColumnType("citext");
 
                     b.Property<DateTime>("CreatedDate")
@@ -145,8 +158,8 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Migrations
                     b.Property<string>("DocumentNumber")
                         .HasColumnType("citext");
 
-                    b.Property<string>("DueDate")
-                        .HasColumnType("citext");
+                    b.Property<DateTime>("DueDate")
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("EmailPIC")
                         .HasColumnType("citext");
@@ -169,7 +182,13 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Migrations
                     b.Property<string>("UpdatedBy")
                         .HasColumnType("citext");
 
+                    b.Property<string>("UpdatedByEmail")
+                        .HasColumnType("citext");
+
                     b.Property<string>("UpdatedByName")
+                        .HasColumnType("citext");
+
+                    b.Property<string>("UpdatedByUpn")
                         .HasColumnType("citext");
 
                     b.Property<DateTime?>("UpdatedDate")
@@ -370,12 +389,7 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Migrations
                     b.Property<DateTime?>("UpdatedDate")
                         .HasColumnType("timestamp without time zone");
 
-                    b.Property<long?>("UserInternalId")
-                        .HasColumnType("bigint");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("UserInternalId");
 
                     b.HasIndex("RoleCode", "RoleName")
                         .IsUnique()
@@ -460,6 +474,13 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Migrations
                     b.Property<string>("DeptCode")
                         .HasColumnType("citext");
 
+                    b.Property<string>("Education")
+                        .IsRequired()
+                        .HasColumnType("citext");
+
+                    b.Property<string>("EducationCode")
+                        .HasColumnType("citext");
+
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("timestamp without time zone");
 
@@ -485,12 +506,6 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Migrations
 
                     b.Property<string>("Password")
                         .HasMaxLength(100)
-                        .HasColumnType("citext");
-
-                    b.Property<string>("RoleCode")
-                        .HasColumnType("citext");
-
-                    b.Property<string>("RoleName")
                         .HasColumnType("citext");
 
                     b.Property<string>("SchoolCode")
@@ -589,6 +604,68 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Migrations
                     b.ToTable("m_UserInternal");
                 });
 
+            modelBuilder.Entity("Kalbe.App.InternsipLogbookMasterData.Api.Models.UserRole", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("citext");
+
+                    b.Property<string>("CreatedByName")
+                        .HasColumnType("citext");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("citext");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("citext");
+
+                    b.Property<string>("RoleCode")
+                        .IsRequired()
+                        .HasColumnType("citext");
+
+                    b.Property<string>("RoleName")
+                        .IsRequired()
+                        .HasColumnType("citext");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("citext");
+
+                    b.Property<string>("UpdatedByName")
+                        .HasColumnType("citext");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<long?>("UserExternalId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("UserInternalId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("UserPrincipalName")
+                        .HasColumnType("citext");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserExternalId")
+                        .IsUnique();
+
+                    b.HasIndex("UserInternalId");
+
+                    b.ToTable("t_UserRole");
+                });
+
             modelBuilder.Entity("Kalbe.App.InternsipLogbookMasterData.Api.Models.ApprovalDetail", b =>
                 {
                     b.HasOne("Kalbe.App.InternsipLogbookMasterData.Api.Models.Approval", "Approval")
@@ -600,16 +677,29 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Migrations
                     b.Navigation("Approval");
                 });
 
-            modelBuilder.Entity("Kalbe.App.InternsipLogbookMasterData.Api.Models.Role", b =>
+            modelBuilder.Entity("Kalbe.App.InternsipLogbookMasterData.Api.Models.UserRole", b =>
                 {
-                    b.HasOne("Kalbe.App.InternsipLogbookMasterData.Api.Models.UserInternal", null)
-                        .WithMany("Roles")
+                    b.HasOne("Kalbe.App.InternsipLogbookMasterData.Api.Models.UserExternal", "UserExternal")
+                        .WithOne("UserRole")
+                        .HasForeignKey("Kalbe.App.InternsipLogbookMasterData.Api.Models.UserRole", "UserExternalId");
+
+                    b.HasOne("Kalbe.App.InternsipLogbookMasterData.Api.Models.UserInternal", "UserInternal")
+                        .WithMany("UserRoles")
                         .HasForeignKey("UserInternalId");
+
+                    b.Navigation("UserExternal");
+
+                    b.Navigation("UserInternal");
+                });
+
+            modelBuilder.Entity("Kalbe.App.InternsipLogbookMasterData.Api.Models.UserExternal", b =>
+                {
+                    b.Navigation("UserRole");
                 });
 
             modelBuilder.Entity("Kalbe.App.InternsipLogbookMasterData.Api.Models.UserInternal", b =>
                 {
-                    b.Navigation("Roles");
+                    b.Navigation("UserRoles");
                 });
 #pragma warning restore 612, 618
         }

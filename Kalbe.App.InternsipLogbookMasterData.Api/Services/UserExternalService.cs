@@ -77,6 +77,8 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Services
                 logData.ExternalEntity += "Start Save ";
                 logData.PayLoadType += "Entity Framework";
                 data.Status = "Unconfirmed";
+                data.UserRole.RoleCode = "INTERN";
+                data.UserRole.RoleName = "Intern";
                 data.UserRole.UserPrincipalName = data.UserPrincipalName;
                 data.UserRole.Name = data.Name;
                 data.EndDate = data.JoinDate.AddDays(30 * data.InternshipPeriodMonth);
@@ -112,8 +114,16 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Services
             #endregion
             try
             {
-                data.Password = Encrypt(data.Password);
+
                 timerFunction.Start();
+                //timer.Start();
+                //logData.ExternalEntity += "Start Get Data ";
+                //logData.PayLoadType += "Entity Framework";
+                //var oldData = _dbContext.UserExternals.AsNoTracking().FirstOrDefault(s => s.Id == data.Id);
+                //data.
+                //await _dbContext.SaveChangesAsync();
+                //timer.Stop();
+                //logData.ExternalEntity += "End Update duration : " + timer.Elapsed.ToString(@"m\:ss\.fff") + ". ";
 
                 timer.Start();
                 logData.ExternalEntity += "Start Update ";
@@ -397,10 +407,12 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Services
 
                 var data = _dbContext.UserExternals.AsNoTracking()
                             .Where(x => !x.IsDeleted && x.UserPrincipalName == UPN).FirstOrDefault();
+
                 var mentor = new Mentor
                 {
                     MentorName = data.SupervisorName,
                     MentorUPN = data.SupervisorUpn
+,                   MentorEmail = _dbContext.UserInternals.AsNoTracking().FirstOrDefault(s => s.UserPrincipalName == data.SupervisorUpn).Email,
                 };
 
                 timer.Stop();
