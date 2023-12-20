@@ -75,7 +75,7 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Services
                 List<ApprovalTransactionDataModel> data = new();
                 if(GetMultiple)
                 {
-                    var dataApproval = _dbContext.ApprovalsDetails.AsNoTracking().Where(s => s.Approval.ApplicationCode.Equals(AppCode) && s.Approval.ModuleCode.Equals(ModuleCode) && s.ApproveDate == null).OrderBy(s => s.ApprovalLine).ToList();
+                    var dataApproval = _dbContext.ApprovalsDetails.AsNoTracking().Include(s => s.Approval).Where(s => s.Approval.ApplicationCode.Equals(AppCode) && s.Approval.ModuleCode.Equals(ModuleCode) && s.ApproveDate == null && s.DocumentNumber.Equals(DocNo) && !s.IsDeleted).OrderBy(s => s.ApprovalLine).ToList();
                     dataApproval.ForEach(s =>
 
                     data.Add(new ApprovalTransactionDataModel
@@ -99,7 +99,7 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Services
                 }
                 else                                               
                 {
-                    var dataApproval = _dbContext.ApprovalsDetails.AsNoTracking().Where(s => s.Approval.ApplicationCode.Equals(AppCode) && s.Approval.ModuleCode.Equals(ModuleCode) && s.ApproveDate == null).OrderBy(s => s.ApprovalLine).FirstOrDefault();
+                    var dataApproval = _dbContext.ApprovalsDetails.AsNoTracking().Include(s => s.Approval).Where(s => s.Approval.ApplicationCode.Equals(AppCode) && s.Approval.ModuleCode.Equals(ModuleCode) && s.ApproveDate == null && s.DocumentNumber.Equals(DocNo) && !s.IsDeleted).OrderBy(s => s.ApprovalLine).FirstOrDefault();
                         data.Add(new ApprovalTransactionDataModel
                         {
                             SystemCode = Constant.SystemCode,
@@ -210,7 +210,7 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Services
         {
             string message = "";
 
-            var workFlow = _dbContext.ApprovalsDetails.AsNoTracking().Where(x => x.DocumentNumber.Equals(docNo)).Count();
+            var workFlow = _dbContext.ApprovalsDetails.AsNoTracking().Where(x => x.DocumentNumber.Equals(docNo) && !x.IsDeleted).Count();
 
             if (workFlow > 0)
             {
@@ -310,26 +310,26 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Services
                     foreach (var item in approvalTransactionList)
                     {
                         var data = _dbContext.ApprovalsDetails.Where(s => s.Id == item.ID).FirstOrDefault();
-                        data.ApproveDate = item?.ApproveDate;
+                        data.ApproveDate = DateTime.Now;
                         _dbContext.Entry(data).State = EntityState.Modified;
                         _dbContext.SaveChanges();
                     }
                     await _dbContext.Database.CommitTransactionAsync();
 
                     //Insert Log Approval
-                    if (string.IsNullOrEmpty(approverTo))
-                    {
-                        var currWf = await GetCurrentApprovalAsync(_obj.SystemCode, modCode, _obj.DocNo, false);
-                        int idx = 0;
-                        foreach (var item in currWf.Data)
-                        {
-                            if (idx == 0)
-                                approverTo = item.PIC;
-                            else
-                                approverTo = ";" + item.PIC;
-                            idx++;
-                        }
-                    } // Added by TMV - July 11, 2022 - bugfix approverTo empty
+                    //if (string.IsNullOrEmpty(approverTo))
+                    //{
+                    //    var currWf = await GetCurrentApprovalAsync(_obj.SystemCode, modCode, _obj.DocNo, false);
+                    //    int idx = 0;
+                    //    foreach (var item in currWf.Data)
+                    //    {
+                    //        if (idx == 0)
+                    //            approverTo = item.PIC;
+                    //        else
+                    //            approverTo = ";" + item.PIC;
+                    //        idx++;
+                    //    }
+                    //} // Added by TMV - July 11, 2022 - bugfix approverTo empty
 
                     var approvalEvent = new Logger
                     {
@@ -453,8 +453,11 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Services
                 try
                 {
                     // Update Table
+                    await _dbContext.Database.BeginTransactionAsync();
                     var dataToDelete = _dbContext.ApprovalsDetails.AsNoTracking().Where(s => s.DocumentNumber.Equals(_obj.DocNo)).ToList();
                     _dbContext.ApprovalsDetails.RemoveRange(dataToDelete);
+                    _dbContext.SaveChanges();
+                    await _dbContext.Database.CommitTransactionAsync();
 
                     if (_dbContext.ApprovalsDetails.AsNoTracking().Where(s => s.DocumentNumber.Equals(_obj.DocNo)).ToList().Count == 0)
                     {
@@ -508,7 +511,7 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Services
                         Message = "Error : " + ex.Message
                     };
                     await _loggerHelper.Save(approvalEvent);
-
+                    await _dbContext.Database.RollbackTransactionAsync();
                     serviceResponse.Success = false;
                     serviceResponse.Message = ex.Message;
                     serviceResponse.Fail(ex);

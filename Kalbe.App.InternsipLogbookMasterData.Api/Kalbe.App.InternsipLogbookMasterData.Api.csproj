@@ -7,7 +7,6 @@
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<NoWarn>$(NoWarn);1591</NoWarn>
 		<Version>0.1.0</Version>
-		<PackageProjectUrl>https://localhost:4438/</PackageProjectUrl>
 	</PropertyGroup>
 
 	<ItemGroup>

@@ -188,6 +188,47 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Services
             }
         }
 
+        public override async Task<UserExternal> GetById(long id)
+        {
+            #region log data
+            Logger logData = new Logger();
+            logData.CreatedDate = DateTime.Now;
+            logData.ModuleCode = _moduleCode;
+            logData.LogType = "Information";
+            logData.Activity = "Get By Id";
+            var timer = new Stopwatch();
+            var timerFunction = new Stopwatch();
+            #endregion
+            try
+            {
+                timerFunction.Start();
+                timer.Start();
+                logData.ExternalEntity += "Start Get By Id ";
+                logData.PayLoadType += "Entity Framework";
+
+                var data = _dbContext.UserExternals.AsNoTracking()
+                    .Include(x => x.UserRole)
+                    .Where(x => !x.IsDeleted && x.Id == id).FirstOrDefault();
+
+                timer.Stop();
+                logData.ExternalEntity += "End Get By Id duration : " + timer.Elapsed.ToString(@"m\:ss\.fff") + ". ";
+                timer.Reset();
+
+                timerFunction.Stop();
+                logData.Message += "Duration Call : " + timerFunction.Elapsed.ToString(@"m\:ss\.fff") + ". ";
+                await _loggerHelper.Save(logData);
+                return data;
+            }
+            catch (Exception x)
+            {
+                timerFunction.Stop();
+                logData.LogType = "Error";
+                logData.Message += "Error " + x + ". Duration : " + timerFunction.Elapsed.ToString(@"m\:ss\.fff") + ". ";
+                await _loggerHelper.Save(logData);
+                throw;
+            }
+        }
+
         public string Encrypt(string password)
         {
             try
@@ -410,9 +451,9 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Services
 
                 var mentor = new Mentor
                 {
-                    MentorName = data.SupervisorName,
-                    MentorUPN = data.SupervisorUpn
-,                   MentorEmail = _dbContext.UserInternals.AsNoTracking().FirstOrDefault(s => s.UserPrincipalName == data.SupervisorUpn).Email,
+                    MentorName = data.MentorName,
+                    MentorUPN = data.MentorUpn
+,                   MentorEmail = _dbContext.UserInternals.AsNoTracking().FirstOrDefault(s => s.UserPrincipalName == data.MentorUpn).Email,
                 };
 
                 timer.Stop();

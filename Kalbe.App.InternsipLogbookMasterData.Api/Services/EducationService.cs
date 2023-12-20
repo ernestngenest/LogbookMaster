@@ -9,7 +9,7 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Services
 {
     public interface IEducationService : ISimpleBaseCrud<Education>
     {
-
+        Task<Education> GetByEducation(string educationCode);
     }
     public class EducationService : SimpleBaseCrud<Education>, IEducationService
     {
@@ -92,6 +92,48 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Services
 
                 timer.Stop();
                 logData.ExternalEntity += "End get by id duration : " + timer.Elapsed.ToString(@"m\:ss\.fff") + ". ";
+                timer.Reset();
+
+                timerFunction.Stop();
+                logData.Message += "Duration Call Save : " + timerFunction.Elapsed.ToString(@"m\:ss\.fff") + ". ";
+                await _loggerHelper.Save(logData);
+
+                return data;
+            }
+            catch (Exception ex)
+            {
+                timerFunction.Stop();
+                logData.LogType = "Error";
+                logData.Message += "Error " + ex + ". Duration : " + timerFunction.Elapsed.ToString(@"m\:ss\.fff") + ". ";
+                await _loggerHelper.Save(logData);
+                throw;
+            }
+        }
+
+        public async Task<Education> GetByEducation(string educationCode)
+        {
+            #region log data
+            Logger logData = new Logger();
+            logData.CreatedDate = DateTime.Now;
+            logData.ModuleCode = _moduleCode;
+            logData.LogType = "Information";
+            logData.Activity = "Get By Education";
+            var timer = new Stopwatch();
+            var timerFunction = new Stopwatch();
+            #endregion
+
+            try
+            {
+                timerFunction.Start();
+                timer.Start();
+                logData.ExternalEntity += "1. Start Get By Education";
+                logData.PayLoadType += "Entity Framework";
+
+                var data = _dbContext.Educations.AsNoTracking()
+                        .Include(s => s.Allowances).Where(s => !s.IsDeleted && s.EducationCode == educationCode).FirstOrDefault();
+
+                timer.Stop();
+                logData.ExternalEntity += "End get by education duration : " + timer.Elapsed.ToString(@"m\:ss\.fff") + ". ";
                 timer.Reset();
 
                 timerFunction.Stop();

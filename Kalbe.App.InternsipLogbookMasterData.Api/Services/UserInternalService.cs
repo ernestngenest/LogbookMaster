@@ -114,8 +114,8 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Services
                 //    }
                 //}
                 _dbContext.Entry(data).State = EntityState.Modified;
-                var existingData = _dbContext.UserRoles.Where(s => s.UserInternalId == data.Id).ToList();
                 var newData = data.UserRoles;
+                var existingData = _dbContext.UserRoles.Where(s => s.UserInternalId == data.Id).ToList();
                 IEnumerable<UserRole> productsToBeInserted = newData.Where(x => !existingData.Select(y => y.RoleCode).Contains(x.RoleCode));
                 int inserted = (productsToBeInserted.Any() ? productsToBeInserted.Count() : 0);
                 if (inserted > 0)
@@ -433,7 +433,7 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Services
                 logData.LogType += "EF";
 
                 var data = _dbContext.UserExternals.AsNoTracking()
-                            .Where(s => s.SupervisorUpn == upn).ToList();
+                            .Where(s => s.MentorUpn == upn).ToList();
 
                 timer.Stop();
                 logData.ExternalEntity += "End Get Get User External By UPN duration : " + timer.Elapsed.ToString(@"m\:ss\.fff") + ". ";

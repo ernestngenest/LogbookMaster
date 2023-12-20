@@ -36,8 +36,8 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Models
         public DateTime  JoinDate { get; set; }
         public DateTime EndDate { get; set; }
 
-        public string SupervisorUpn { get; set; }
-        public string SupervisorName { get; set; }
+        public string MentorUpn { get; set; }
+        public string MentorName { get; set; }
         public  string CompanyCode { get; set; }
         public string CompanyName { get; set; }
         public int InternshipPeriodMonth { get; set; }

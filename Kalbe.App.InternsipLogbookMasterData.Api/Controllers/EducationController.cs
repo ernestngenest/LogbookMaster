@@ -21,5 +21,19 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Controllers
             educationService = simpleBaseCrud;
             dbHandler = databaseExceptionHandler;
         }
+
+        [HttpGet("GetByEducation/{educationCode}")]
+        public async Task<IActionResult> GetByEducation(string educationCode)
+        {
+            try
+            {
+                var result = await educationService.GetByEducation(educationCode);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message.ToString());
+            }
+        }
     }
 }
