@@ -115,7 +115,7 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Services
                 //}
                 _dbContext.Entry(data).State = EntityState.Modified;
                 var newData = data.UserRoles;
-                var existingData = _dbContext.UserRoles.Where(s => s.UserInternalId == data.Id).ToList();
+                var existingData = await _dbContext.UserRoles.AsNoTracking().Where(s => s.UserInternalId == data.Id && !s.IsDeleted).ToListAsync();
                 IEnumerable<UserRole> productsToBeInserted = newData.Where(x => !existingData.Select(y => y.RoleCode).Contains(x.RoleCode));
                 int inserted = (productsToBeInserted.Any() ? productsToBeInserted.Count() : 0);
                 if (inserted > 0)

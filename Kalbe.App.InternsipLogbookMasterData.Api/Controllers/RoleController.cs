@@ -14,8 +14,26 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Controllers
     [AllowAnonymous]
     public class RoleController : SimpleBaseCrudController<Role>
     {
+        private IRoleService roleService;
+        private IDatabaseExceptionHandler _dbHandler;
         public RoleController(IRoleService simpleBaseCrud, IDatabaseExceptionHandler databaseExceptionHandler) : base(simpleBaseCrud, databaseExceptionHandler)
         {
+            roleService = simpleBaseCrud;
+            _dbHandler = databaseExceptionHandler;
+        }
+
+        [HttpGet("GetRoleByUpn")]
+        public async Task<IActionResult> GetRoleByUpn(string Upn)
+        {
+            try
+            {
+                var result = await roleService.GetRoleByUpn(Upn);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }

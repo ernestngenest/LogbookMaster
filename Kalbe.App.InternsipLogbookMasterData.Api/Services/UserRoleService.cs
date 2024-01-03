@@ -3,6 +3,8 @@ using Kalbe.App.InternsipLogbookMasterData.Api.Models.Commons;
 using Kalbe.App.InternsipLogbookMasterData.Api.Utilities;
 using Kalbe.Library.Common.EntityFramework.Data;
 using Microsoft.EntityFrameworkCore;
+using NPOI.SS.Formula.Functions;
+using Serilog.Events;
 using System.Diagnostics;
 
 namespace Kalbe.App.InternsipLogbookMasterData.Api.Services
@@ -10,6 +12,7 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Services
     public interface IUserRoleService : ISimpleBaseCrud<UserRole>
     {
         Task<IEnumerable<UserRole>> GetMentor();
+        //Task UpdateByHeader(IEnumerable<UserRole> existingEntities, IEnumerable<UserRole> entities, bool saveChanges = false);
     }
     public class UserRoleService : SimpleBaseCrud<UserRole>, IUserRoleService
     {
@@ -31,7 +34,7 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Services
             logData.CreatedDate = DateTime.Now;
             logData.ModuleCode = _moduleCode;
             logData.LogType = "Information";
-            logData.Activity = "Get Unconfirmed User";
+            logData.Activity = "Get Mentor User";
             var timer = new Stopwatch();
             var timerFunction = new Stopwatch();
             #endregion
@@ -66,7 +69,25 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Services
                 await _loggerHelper.Save(logData);
                 throw;
             }
-
         }
+
+        //public async Task UpdateByHeader(IEnumerable<UserRole> existingEntities, IEnumerable<UserRole> entities, bool saveChanges = false)
+        //{
+        //    IEnumerable<UserRole> productsToBeUpdated = entities.Where(x => existingEntities.Select(y => y.Id).Contains(x.Id));
+        //    int updated = (productsToBeUpdated.Any() ? productsToBeUpdated.Count() : 0);
+        //    IEnumerable<UserRole> productsToBeInserted = entities.Where(x => !existingEntities.Select(y => y.Id).Contains(x.Id));
+        //    int inserted = (productsToBeInserted.Any() ? productsToBeInserted.Count() : 0);
+        //    IEnumerable<UserRole> productsToBeDeleted = existingEntities.Where(x => !entities.Select(y => y.Id).Contains(x.Id));
+        //    int deleted = (productsToBeDeleted.Any() ? productsToBeDeleted.Count() : 0);
+        //    _dbContext.UpdateRange(productsToBeUpdated);
+        //    _dbContext.AddRange(productsToBeInserted);
+        //    _dbContext.RemoveRange(productsToBeDeleted);
+        //    _logger.Log(LogEventLevel.Information, "update data : " + updated + ". insert data : " + inserted + ". delete data : " + deleted);
+        //    if (saveChanges)
+        //    {
+        //        _logger.Log(LogEventLevel.Information, "insert data : " + inserted);
+        //        await _dbContext.SaveChangesAsync();
+        //    }
+        //}
     }
 }

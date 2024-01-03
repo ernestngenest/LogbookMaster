@@ -9,7 +9,7 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Models
     public class Department : Base
     {
         [Required]
-        public string DepartmenetCode { get; set; }
+        public string DepartmentCode { get; set; }
         public string DepartmentName { get; set; }
     }
 }

@@ -295,7 +295,7 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Services
                 logData.ExternalEntity += "1. Start Get Unconfirmed Data";
                 logData.PayLoadType += "Entity Framework";
 
-                var data = _dbContext.UserExternals.AsNoTracking().Where(x => x.Status.Equals("Unconfirmed")).ToList();
+                var data = _dbContext.UserExternals.AsNoTracking().Include(x => x.UserRole).Where(x => x.Status.Equals("Unconfirmed")).ToList();
 
                 timer.Stop();
                 logData.ExternalEntity += "End get unconfirmed data duration : " + timer.Elapsed.ToString(@"m\:ss\.fff") + ". ";
