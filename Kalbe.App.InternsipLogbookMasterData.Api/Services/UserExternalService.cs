@@ -165,7 +165,11 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Services
             {
                 timerFunction.Start();
                 logData.DocumentNumber = data.Id.ToString();
-                logData.PayLoad = JsonConvert.SerializeObject(data);
+                logData.PayLoad = JsonConvert.SerializeObject(data, Formatting.None,
+                        new JsonSerializerSettings()
+                        {
+                            ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+                        });
 
                 timer.Start();
                 logData.ExternalEntity += "Start Delete ";

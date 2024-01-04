@@ -303,7 +303,7 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Services
                     var dataRole = _dbContext.UserInternals
                     .AsNoTracking()
                     .Include(s => s.UserRoles.Where(x => !x.IsDeleted))
-                    .Where(s => !s.IsDeleted && (s.UserRoles.Any(x => x.RoleCode.Contains(searchTrim)) || s.UserRoles.Any(x => x.RoleName.Contains(searchTrim))));
+                    .Where(s => !s.IsDeleted && (s.UserRoles.Any(x => x.RoleCode.Contains(searchTrim) && !x.IsDeleted) || s.UserRoles.Any(x => x.RoleName.Contains(searchTrim) && !x.IsDeleted)));
                     result = await PagedList<UserInternal>.GetPagedList(dataRole, pagedOptions);
                 }
 
