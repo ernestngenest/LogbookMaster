@@ -1,8 +1,12 @@
-﻿namespace Kalbe.App.InternsipLogbookMasterData.Api.Models
+﻿using Kalbe.Library.Common.EntityFramework.Models;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace Kalbe.App.InternsipLogbookMasterData.Api.Models
 {
-    public class Company
+    [Table("m_Company")]
+    public class Company : Base
     {
         public string Name { get; set; }
-        public string kode { get; set; }
+        public string Code { get; set; }
     }
 }
