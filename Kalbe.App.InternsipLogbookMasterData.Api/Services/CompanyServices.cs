@@ -10,7 +10,7 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Services
     }
     public class CompanyServices : SimpleBaseCrud<Company>
     {
-        public CompanyServices(Library.Common.Logs.ILogger logger, DbContext dbContext) : base(logger, dbContext)
+        public CompanyServices(Library.Common.Logs.ILogger logger, InternsipLogbookMasterDataDataContext dbContext) : base(logger, dbContext)
         {
         }
     }

@@ -38,6 +38,20 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Controllers
             }
         }
 
+        [HttpGet("GetAllUserByPeriod")]
+        public async Task<IActionResult> GetAllUserByPeriod(DateTime startDate, DateTime endDate)
+        {
+            try
+            {
+                var result = await _service.GetAllUserByPeriod(startDate, endDate);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
         [HttpPut("ConfirmUser/{id}")]
         public async Task<IActionResult> ConfirmUser(long id)
         {

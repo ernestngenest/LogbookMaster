@@ -26,6 +26,7 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Services
         string Encrypt(string password);
 
         Task<IEnumerable<UserExternal>> GetUnconfirmedUser();
+        Task<IEnumerable<UserExternal>> GetAllUserByPeriod(DateTime startDate, DateTime endDate);
         Task<UserExternal> ConfirmUser(long id);
         Task<PagedList<UserExternal>> GetUserExternal(PagedOptions pagedOptions);
         Task<Mentor> GetMentorByUPN(string UPN);
@@ -81,7 +82,7 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Services
                 data.UserRole.RoleName = "Intern";
                 data.UserRole.UserPrincipalName = data.UserPrincipalName;
                 data.UserRole.Name = data.Name;
-                data.EndDate = data.JoinDate.AddDays(30 * data.InternshipPeriodMonth);
+                data.EndDate = data.StartDate.AddDays(30 * data.InternshipPeriodMonth);
                 _dbContext.Set<UserExternal>().Add(data);
                 await _dbContext.SaveChangesAsync();
                 timer.Stop();
@@ -321,6 +322,47 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Services
             }
         }
 
+        public async Task<IEnumerable<UserExternal>> GetAllUserByPeriod(DateTime startDate, DateTime endDate)
+        {
+            #region log data
+            Logger logData = new Logger();
+            logData.CreatedDate = DateTime.Now;
+            logData.ModuleCode = _moduleCode;
+            logData.LogType = "Information";
+            logData.Activity = "Get All User By Period Filter";
+            var timer = new Stopwatch();
+            var timerFunction = new Stopwatch();
+            #endregion
+
+            try
+            {
+                timerFunction.Start();
+                timer.Start();
+                logData.ExternalEntity += "1. Start Get All User By Period Filter";
+                logData.PayLoadType += "Entity Framework";
+
+                var data = _dbContext.UserExternals.AsNoTracking().Include(x => x.UserRole).Where(x => x.StartDate >= startDate && x.EndDate <= endDate).ToList();
+
+                timer.Stop();
+                logData.ExternalEntity += "End get all data by period duration : " + timer.Elapsed.ToString(@"m\:ss\.fff") + ". ";
+                timer.Reset();
+
+                timerFunction.Stop();
+                logData.Message += "Duration Call Save : " + timerFunction.Elapsed.ToString(@"m\:ss\.fff") + ". ";
+                await _loggerHelper.Save(logData);
+
+                return data;
+            }
+            catch (Exception ex)
+            {
+                timerFunction.Stop();
+                logData.LogType = "Error";
+                logData.Message += "Error " + ex + ". Duration : " + timerFunction.Elapsed.ToString(@"m\:ss\.fff") + ". ";
+                await _loggerHelper.Save(logData);
+                throw;
+            }
+        }
+
         public async Task<UserExternal> ConfirmUser(long id)
         {
             #region log data
@@ -412,7 +454,7 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Services
                 var result = await PagedList<UserExternal>.GetPagedList(data, pagedOptions);
 
                 timer.Stop();
-                logData.ExternalEntity += "End get mentor duration : " + timer.Elapsed.ToString(@"m\:ss\.fff") + ". ";
+                logData.ExternalEntity += "End get pagedlist duration : " + timer.Elapsed.ToString(@"m\:ss\.fff") + ". ";
                 timer.Reset();
 
                 timerFunction.Stop();
