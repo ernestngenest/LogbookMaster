@@ -98,14 +98,15 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Services
             logData.CreatedDate = DateTime.Now;
             logData.ModuleCode = _moduleCode;
             logData.LogType = "Information";
-            logData.Activity = "Authenticate";
+            logData.Activity = "Authenticate External";
             var timer = new Stopwatch();
             var timerFunction = new Stopwatch();
             #endregion
             try
             {
                 timerFunction.Start();
-
+                logData.DocumentNumber = DataUser.Username;
+                logData.PayLoad = JsonConvert.SerializeObject(DataUser);
                 timer.Start();
                 logData.ExternalEntity += "Start Get Data UserExternal ";
                 logData.PayLoadType += "Entity Framework";

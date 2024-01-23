@@ -69,13 +69,25 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Services
             {
                 timerFunction.Start();
                 logData.PayLoad = JsonConvert.SerializeObject(data);
+                timer.Start();
+                logData.ExternalEntity += "Start Check Register User, ";
+                logData.PayLoadType += "Entity Framework";
+
+                var dataExist = _dbContext.UserExternals.AsNoTracking().Where(x => x.UserPrincipalName == data.UserPrincipalName && !x.IsDeleted).FirstOrDefault();
+                if (dataExist != null)
+                {
+                    throw new Exception("Email is already registered");
+                }
+
+                timer.Stop();
+                logData.ExternalEntity += "End Check Register User duration : " + timer.Elapsed.ToString(@"m\:ss\.fff") + ". ";
 
                 data.Password = Encrypt(data.Password);
                 data.Status = "Unconfirmed";
                 _logger.Log(LogEventLevel.Debug, " Creating new " + typeof(UserExternal).Name + " data to database");
 
                 timer.Start();
-                logData.ExternalEntity += "Start Save ";
+                logData.ExternalEntity += "Start Save, ";
                 logData.PayLoadType += "Entity Framework";
                 data.Status = "Unconfirmed";
                 data.UserRole.RoleCode = "INTERN";
@@ -300,7 +312,7 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Services
                 logData.ExternalEntity += "1. Start Get Unconfirmed Data";
                 logData.PayLoadType += "Entity Framework";
 
-                var data = _dbContext.UserExternals.AsNoTracking().Include(x => x.UserRole).Where(x => x.Status.Equals("Unconfirmed")).ToList();
+                var data = _dbContext.UserExternals.AsNoTracking().Include(x => x.UserRole).Where(x => x.Status.Equals("Unconfirmed") && !x.IsDeleted).OrderByDescending(x => x.CreatedDate).ToList();
 
                 timer.Stop();
                 logData.ExternalEntity += "End get unconfirmed data duration : " + timer.Elapsed.ToString(@"m\:ss\.fff") + ". ";
