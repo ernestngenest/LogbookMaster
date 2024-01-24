@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using NPOI.OpenXmlFormats.Dml;
 using Serilog.Events;
 using System.Diagnostics;
 using System.Text;
@@ -30,6 +31,7 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Services
         Task<UserExternal> ConfirmUser(long id);
         Task<PagedList<UserExternal>> GetUserExternal(PagedOptions pagedOptions);
         Task<Mentor> GetMentorByUPN(string UPN);
+        Task<List<UserExternal>> GetActiveUser();
     }
     public class UserExternalService : SimpleBaseCrud<UserExternal>, IUserExternalService
     {
@@ -523,6 +525,52 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Services
                 logData.Message += "Duration Call : " + timerFunction.Elapsed.ToString(@"m\:ss\.fff") + ". ";
                 await _loggerHelper.Save(logData);
                 return mentor;
+            }
+            catch (Exception ex)
+            {
+                timerFunction.Stop();
+                logData.LogType = "Error";
+                logData.Message += "Error " + ex + ". Duration : " + timerFunction.Elapsed.ToString(@"m\:ss\.fff") + ". ";
+                await _loggerHelper.Save(logData);
+                throw;
+            }
+        }
+        public async Task<List<UserExternal>> GetActiveUser()
+        {
+            #region log data
+            Logger logData = new Logger();
+            logData.CreatedDate = DateTime.Now;
+            logData.ModuleCode = _moduleCode;
+            logData.LogType = "Information";
+            logData.Activity = "Get User External PagedList";
+            var timer = new Stopwatch();
+            var timerFunction = new Stopwatch();
+            #endregion
+            try
+            {
+             
+                timerFunction.Start();
+                timer.Start();
+
+                timer.Start();
+                logData.ExternalEntity += "1. Start Get User External Data";
+                logData.LogType += "EF";
+
+                var data = _dbContext.UserExternals.AsNoTracking()
+                            .AsNoTracking()
+                            .Where(x => !x.IsDeleted && DateTime.Now >= x.StartDate && DateTime.Now <= x.EndDate)
+                            .AsEnumerable()
+                            .ToList();
+
+                timer.Stop();
+                logData.ExternalEntity += "End get user external duration : " + timer.Elapsed.ToString(@"m\:ss\.fff") + ". ";
+                timer.Reset();
+
+
+                timerFunction.Stop();
+                logData.Message += "Duration Call : " + timerFunction.Elapsed.ToString(@"m\:ss\.fff") + ". ";
+                await _loggerHelper.Save(logData);
+                return data;
             }
             catch (Exception ex)
             {

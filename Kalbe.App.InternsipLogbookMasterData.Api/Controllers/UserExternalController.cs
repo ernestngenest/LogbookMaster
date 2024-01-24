@@ -111,5 +111,18 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Controllers
                 return NotFound("data not found");
             }
         }
+        [HttpGet("GetActiveUser")]
+        public async Task<IActionResult> GetActiveUser()
+        {
+            try
+            {
+                var result = await _service.GetActiveUser();
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }
