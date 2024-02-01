@@ -18,6 +18,7 @@ namespace Kalbe.App.InternsipLogbookMasterData.Api.Controllers
         private readonly IHttpContextAccessor _contextAccessor;
         private readonly IUserExternalService _service;
         private readonly IDatabaseExceptionHandler _handler;
+     
         public UserExternalController(IUserExternalService simpleBaseCrud, IDatabaseExceptionHandler databaseExceptionHandler) : base(simpleBaseCrud, databaseExceptionHandler)
         {
             _service = simpleBaseCrud;
